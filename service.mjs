@@ -1,4 +1,5 @@
 import http from 'node:http';
+import {quoteShipping} from './shipping.mjs';
 import { setTimeout as wait } from 'node:timers/promises';
 import { ROOT_CONTEXT, context, trace, propagation } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
@@ -35,8 +36,7 @@ const server = http.createServer(async (req, res) => {
         if (!reply.ok) throw new Error('Shipping unavailable');
         children.push(...await reply.json());
       } else {
-        const delayed = url.searchParams.get('phase') === 'incident' && url.searchParams.get('lane') === 'island';
-        await wait(delayed ? 620 : 12);
+        await quoteShipping(url.searchParams.get('phase'), url.searchParams.get('lane'));
       }
       return [finish(root), ...children];
     });

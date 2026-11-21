@@ -46,3 +46,12 @@ The terminal prints each phase's p95 and maximum. Exact milliseconds will vary. 
 - **What would you monitor next?** Try the share of orders completing within a shopper-facing target, then break down that share by shipping route. A route with four samples carries considerable statistical uncertainty. Inspect sample counts and individual traces alongside its percentile.
 - **What did you build on?** The OpenTelemetry demo supplied the idea of a regional slowdown. This project's contribution is the controlled traffic mix, captured three-phase workload and interactive public investigation. The use of a coding assistant is part of how this implementation was produced. The experiments you run and the decisions you can defend are yours to describe.
 
+
+## Demonstrate it in an interview
+
+1. Run the live experiment with Island selected. Each click sends three HTTP requests to a Vercel function. The response reports elapsed server time around the same shipping routine used in the original two-service lab.
+2. Run Mainland as the control. The extra incident delay applies only to Island. These are fresh measurements of shipping alone. Network time, cart validation and checkout processing are outside that timer.
+3. Play the 100 recorded incident orders. Check that the orange tiles accumulate even though every request succeeds. Open the first slow order and compare it with recovery.
+4. If asked what triggered recovery, explain that the experiment explicitly selects the normal timer for the recovery request. Each visitor runs an isolated comparison. The demo does not modify shared service state or perform an automatic repair.
+
+A plain static file server supports the recorded replay. The live route requires the deployed site or a Vercel development server.

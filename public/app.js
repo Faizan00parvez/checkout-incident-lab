@@ -24,8 +24,8 @@ function pick(i) {
     el('spans').append(row);
   }
 }
-function render() {
-  const orders = run.phases[phase], times = orders.map(o=>o.spans[0].ms).sort((a,b)=>a-b);
+function render(count = run.phases[phase].length) {
+  const orders = run.phases[phase].slice(0,count), times = orders.map(o=>o.spans[0].ms).sort((a,b)=>a-b);
   const stats = [['Successful orders',orders.filter(o=>o.status===200).length + ' / ' + orders.length],['Overall p95',ms(times[Math.ceil(times.length*.95)-1])],['Slowest checkout',ms(times.at(-1))]];
   el('stats').innerHTML = stats.map(([label,value])=>'<div class="stat"><small>'+label+'</small><b>'+value+'</b></div>').join('');
   el('tiles').replaceChildren();
@@ -41,15 +41,40 @@ function render() {
   document.querySelectorAll('[data-phase]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.phase===phase));
   pick(index);
 }
-document.querySelectorAll('[data-phase]').forEach(b=>b.onclick=()=>{if(run){phase=b.dataset.phase;render()}});
+let clock;
+document.querySelectorAll('[data-phase]').forEach(b=>b.onclick=()=>{if(run){clock.pause();phase=b.dataset.phase;render()}});
 el('choices').onclick = event=>{
   if(event.target.tagName!=='BUTTON') return;
+  clock.pause();
   phase='incident';index=24;render();
   const spans=run.phases.incident[index].spans;
   el('answer').textContent = (event.target.textContent==='Shipping quote'?'Yes. ':'Compare the child spans. ')+'In checkout 025, cart validation took '+ms(spans[1].ms)+' and shipping took '+ms(spans[2].ms)+'. Switch to Recovery to compare the same order after the delay was removed.';
 };
 fetch('run.json').then(r=>{if(!r.ok)throw Error();return r.json()}).then(data=>{
   run=data;
+  clock = setupReplay(run);
   el('notes').textContent='Captured '+run.recorded.slice(0,10)+' UTC on Node '+run.runtime+'. Overall p95 is the 95th fastest of 100 checkout spans. The 200 ms threshold is a lab target.';
   render();el('work').hidden=false;el('loading').hidden=true;
 }).catch(()=>{el('loading').textContent='The replay could not load. Refresh to retry.'});
+
+el('run-live').onclick = async () => {
+  const lane = el('route').value;
+  el('run-live').disabled = el('route').disabled = true;
+  el('live-results').replaceChildren();
+  try {
+    for (const phase of ['baseline', 'incident', 'recovery']) {
+      el('live-status').textContent = 'Requesting the ' + phase + ' quote…';
+      const response = await fetch('/api/quote?lane=' + lane + '&phase=' + phase, {method:'POST', signal:AbortSignal.timeout(15000)});
+      if (!response.ok) throw Error();
+      const result = await response.json();
+      const row = document.createElement('li');
+      row.textContent = phase + ' · ' + ms(result.shippingMs);
+      el('live-results').append(row);
+    }
+    el('live-status').textContent = 'Measured on the server for this run. ' + (lane === 'island' ? 'Try Mainland as a control. Only island quotes receive the extra delay.' : 'The mainland route uses the normal shipping timer throughout. Try Island to see the fault.');
+  } catch {
+    el('live-status').textContent = 'The live request could not finish. Try again or explore the recorded run below.';
+  } finally {
+    el('run-live').disabled = el('route').disabled = false;
+  }
+};

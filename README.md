@@ -23,3 +23,9 @@ The regional fault was inspired by the [OpenTelemetry demo feature flags](https:
 ## Next experiment
 
 At what traffic share would overall p95 first expose the slow lane? Repeat with five and six affected requests per hundred while keeping the rest of the workload fixed.
+
+## Public demo
+
+The 25-second player has five chapters. Pause the run, jump to a chapter, or drag the timeline backward to reconstruct the request grid and trace from the same captured data. The playback interaction was inspired by [Anshu's Run Rewind](https://ecliptix-ui.101xanshu.com/components/run-rewind). This implementation uses browser JavaScript and the checkout experiment's recorded measurements.
+
+Select **Run experiment** to issue three fresh shipping requests on Vercel. Select Mainland to repeat on the unaffected route. The function times the shared shipping routine on the server. Use the recorded lab for the full distributed checkout trace.
