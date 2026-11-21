@@ -1,0 +1,17 @@
+services:
+  shipping:
+    build: .
+    environment:
+      SERVICE: shipping
+      HOST: 0.0.0.0
+      PORT: 8001
+  checkout:
+    build: .
+    environment:
+      SERVICE: checkout
+      HOST: 0.0.0.0
+      PORT: 8000
+      SHIPPING: http://shipping:8001
+    ports:
+      - "127.0.0.1:8000:8000"
+

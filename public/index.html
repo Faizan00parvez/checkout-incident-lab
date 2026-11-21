@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The missing four · Checkout Incident Lab</title><meta name="description" content="Investigate 100 successful checkout requests. Four shoppers tell a different story. A measured OpenTelemetry replay by @faizanxbuilds.">
+<link rel="stylesheet" href="style.css"><main>
+<header><strong>Checkout Incident Lab</strong><a href="https://x.com/faizanxbuilds">@faizanxbuilds</a></header>
+<section class="intro"><small>Reliability field notes / Recorded experiment</small><h1>The missing four<span>.</span></h1><p>Every order went through. Four shoppers still had a very different checkout. Can you find where their time went?</p></section>
+<nav aria-label="Experiment phase"><button data-phase="baseline">Baseline</button><button data-phase="incident" aria-pressed="true">Incident</button><button data-phase="recovery">Recovery</button></nav>
+<section id="work" hidden><div class="stats" id="stats"></div>
+<div class="panels"><article><small>Request ledger</small><h2>Pick a checkout</h2><p>Each tile is one order, in arrival order.</p><div id="tiles"></div><div class="key"><i></i> Under 200 ms <i class="late"></i> 200 ms or more</div></article>
+<article><small>Distributed trace</small><h2 id="order"></h2><p id="lane"></p><div id="spans"></div><p class="micro" id="scale"></p><details><summary>Read this trace</summary><p>The checkout span includes validation and the HTTP call to shipping. Child durations overlap the parent. The gap includes uninstrumented work.</p></details></article></div>
+<section class="diagnosis"><small>Your diagnosis</small><h2>Where did the extra wait happen?</h2><div id="choices"><button>Cart validation</button><button>Shipping quote</button></div><p id="answer" aria-live="polite"></p></section>
+<details><summary>Experiment notes &amp; raw measurements</summary><p id="notes"></p><p>Two local Node.js processes exchanged real HTTP requests. OpenTelemetry linked spans across the boundary. One request ran at a time after eight warmups. The same four order positions used the island route in each phase. During the incident only, its shipping handler waited 620 ms instead of 12 ms. Recovery restored the original setting. These are controlled lab timings.</p><a href="run.json">Raw run (JSON)</a> · <a href="https://github.com/Faizan00parvez/checkout-incident-lab">Code and reproduction steps</a></details></section>
+<p id="loading" role="status">Loading recorded traces…</p><footer>Checkout Incident Lab <span>Faizan / Cloud &amp; DevOps</span></footer></main><script src="app.js" defer></script></html>
