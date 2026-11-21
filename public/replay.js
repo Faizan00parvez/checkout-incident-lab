@@ -17,7 +17,7 @@ function setupReplay(data) {
   scenes.forEach(([title], i) => {
     const button = document.createElement('button');
     button.textContent = title;
-    button.onclick = () => { pause(); draw(i * 5); };
+    button.onclick = () => { draw(i * 5); pause(); };
     chapters.append(button);
   });
   const limit = Math.max(...Object.values(data.phases).flat().map(o=>o.spans[0].ms));
@@ -58,7 +58,7 @@ function setupReplay(data) {
   function tick(now) {
     const next = Math.min(duration,(now-started)/1000);
     if (Math.floor(next*10)!==Math.floor(time*10)) draw(next);
-    if (next >= duration) { draw(duration); pause(); }
+    if (next >= duration) { draw(duration); pause(); completeView('replay'); }
     else frame = requestAnimationFrame(tick);
   }
   el('toggle').onclick = () => {
@@ -68,7 +68,7 @@ function setupReplay(data) {
     el('toggle').textContent='Pause';el('toggle').setAttribute('aria-label','Pause replay');
     frame=requestAnimationFrame(tick);
   };
-  seek.oninput=()=>{draw(Number(seek.value));pause();};
+  seek.oninput=()=>{draw(Number(seek.value));pause();if(time>=duration)completeView('replay');};
   el('player').hidden=false;draw(0);
   return {pause};
 }

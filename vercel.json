@@ -1,1 +1,6 @@
-{"framework":null,"installCommand":"","buildCommand":"","outputDirectory":"public"}
+{
+  "framework": null,
+  "installCommand": "",
+  "buildCommand": "node -e \"require('fs').copyFileSync('launch/slip-025-launch.mp4','public/launch-film.mp4')\"",
+  "outputDirectory": "public"
+}

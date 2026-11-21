@@ -1,25 +1,27 @@
 <!doctype html>
-<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Slip 025 · Checkout Incident Lab</title><meta name="description" content="Investigate 100 successful checkout requests. Four shoppers tell a different story. A measured OpenTelemetry replay by @faizanxbuilds.">
-<link rel="stylesheet" href="style.css"><main>
-<header><strong>Checkout Incident Lab</strong><a href="https://x.com/faizanxbuilds">@faizanxbuilds</a></header>
-<section class="intro"><small>Reliability field notes / Recorded experiment</small><h1>Slip 025<span>.</span></h1><p>Every order went through. Four shoppers still had a very different checkout. Can you find where their time went?</p></section>
-<section class="player" id="player" aria-labelledby="player-title" hidden>
-<div class="player-head"><small>Experiment replay</small><span>Measured traces &middot; condensed time</span></div>
-<div class="stage"><div class="scene"><h2 id="player-title"></h2><p id="scene-note"></p><div id="scene-screen"></div></div>
-<div class="chapters" aria-label="Replay chapters"></div></div>
-<div class="transport"><button id="toggle" aria-label="Play replay">Play</button><input type="range" id="seek" min="0" max="25" step="0.1" value="0" aria-label="Replay time"><output id="elapsed" for="seek"></output></div>
-</section>
-<section class="diagnosis" aria-labelledby="live-title">
-<small>Live experiment</small><h2 id="live-title">Make a shipping quote slow</h2>
-<p>Choose a route. Send three fresh requests to see how shipping behaves before, during and after a delay on the island route.</p>
-<div class="live-controls"><label for="route">Route</label> <select id="route"><option value="island">Island</option><option value="mainland">Mainland</option></select> <button id="run-live">Run experiment</button></div>
-<ol id="live-results" aria-label="Server timing for each request"></ol><p id="live-status" role="status"></p></section>
-<h2>Explore all recorded orders</h2>
-<nav aria-label="Experiment phase"><button data-phase="baseline">Baseline</button><button data-phase="incident" aria-pressed="true">Incident</button><button data-phase="recovery">Recovery</button></nav>
-<section id="work" hidden><div class="stats" id="stats"></div>
-<div class="panels"><article><small>Request ledger</small><h2>Pick a checkout</h2><p>Each tile is one order, in arrival order.</p><div id="tiles"></div><div class="key"><i></i> Under 200 ms <i class="late"></i> 200 ms or more</div></article>
-<article><small>Distributed trace</small><h2 id="order"></h2><p id="lane"></p><div id="spans"></div><p class="micro" id="scale"></p><details><summary>Read this trace</summary><p>The checkout span includes validation and the HTTP call to shipping. Child durations overlap the parent. The gap includes uninstrumented work.</p></details></article></div>
-<section class="diagnosis"><small>Your diagnosis</small><h2>Where did the extra wait happen?</h2><div id="choices"><button>Cart validation</button><button>Shipping quote</button></div><p id="answer" aria-live="polite"></p></section>
-<details><summary>Experiment notes &amp; raw measurements</summary><p id="notes"></p><p>Two local Node.js processes exchanged real HTTP requests. OpenTelemetry linked spans across the boundary. One request ran at a time after eight warmups. The same four order positions used the island route in each phase. During the incident only, its shipping handler waited 620 ms instead of 12 ms. Recovery restored the original setting. These are controlled lab timings.</p><a href="run.json">Raw run (JSON)</a> · <a href="https://github.com/Faizan00parvez/checkout-incident-lab">Code and reproduction steps</a></details></section>
-<p id="loading" role="status">Loading recorded traces…</p><footer>Checkout Incident Lab <span>Faizan / Cloud &amp; DevOps</span></footer></main><script src="replay.js" defer></script><script src="app.js" defer></script></html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slip 025 · Checkout Incident Lab</title><meta name="description" content="Follow 100 recorded checkouts to find four slow shipping requests. Inspect their traces, then try the fault live."><link rel="stylesheet" href="style.css"></head>
+<body><a class="skip" href="#lab">Skip to the lab</a><main>
+<header class="mast"><a class="wordmark" href="./" aria-label="Slip 025 home">Slip <i>025</i></a><a href="https://github.com/Faizan00parvez/checkout-incident-lab">View source ↗</a></header>
+<section class="intro"><div><small>Checkout incident lab</small><h1>Find the slow <i>checkout.</i></h1><p>All 100 orders went through. Four shoppers waited over 600 milliseconds. Can you spot what slowed them down?</p><div class="actions"><a class="primary" id="start" href="#replay">Start the investigation</a><button class="text-btn" id="watch">Watch the film</button></div></div>
+<picture><source media="(max-width: 600px)" srcset="trace-compact.webp"><img src="trace-wide.webp" width="540" height="310" alt="Order 025 receipt. Shipping took 624 of the 639 milliseconds spent in checkout."></picture></section>
+<div id="lab" tabindex="-1"><div class="lesson-meter"><label for="lesson-progress">Your investigation</label><progress max="3" value="0" id="lesson-progress"></progress><span id="progress-text">0 of 3 complete</span></div><nav class="modes" aria-label="Lab views"><a href="#replay" data-view="replay">Incident replay</a><a href="#explore" data-view="explore">Order explorer</a><a href="#live" data-view="live">Live experiment</a></nav>
+<section id="replay" class="view"><div id="player" hidden>
+<div class="player-head"><small>Recorded run</small><span>25-second replay</span></div>
+<div class="stage"><div class="scene"><h2 id="player-title"></h2><p id="scene-note"></p><div id="scene-screen"></div></div><div class="chapters" aria-label="Replay chapters"></div></div>
+<div class="transport"><button id="toggle" aria-label="Play replay">Play</button><input type="range" id="seek" min="0" max="25" step="0.1" value="0" aria-label="Replay time"><output id="elapsed" for="seek"></output></div></div>
+<a href="#explore" class="next">Inspect individual orders →</a></section>
+<section id="explore" class="view" hidden><div class="section-title"><div><small>Recorded requests</small><h2>Order explorer</h2></div>
+<nav class="phases" aria-label="Experiment phase"><button data-phase="baseline">Baseline</button><button data-phase="incident" aria-pressed="true">Incident</button><button data-phase="recovery">Recovery</button></nav></div>
+<div id="work" hidden><div class="stats" id="stats"></div>
+<div class="panels"><article><h3>Request ledger</h3><p>Pick an order to inspect its trace. Use the arrow keys to move between orders.</p><div id="tiles" aria-label="Checkout orders"></div><div class="key"><i></i> Under 200 ms <i class="late"></i> 200 ms or more</div></article>
+<article><small>Distributed trace</small><h3 id="order"></h3><p id="lane"></p><div id="spans"></div><p class="micro" id="scale"></p><details><summary>How to read the bars</summary><p>Checkout includes the time spent validating the cart and calling shipping. The child bars sit inside that total.</p></details></article></div>
+<section class="diagnosis"><h3>Where did order 025 spend the extra time?</h3><div id="choices"><button>Cart validation</button><button>Shipping quote</button></div><p id="answer" role="status"></p></section></div></section>
+<section id="live" class="view" hidden><div class="live-layout"><div><small>Fresh server measurements</small><h2 id="live-title">Test the shipping route.</h2><p>Run three quotes on one route. The incident adds a delay to Island shipping. Mainland gives you a control.</p><div class="live-controls"><label for="route">Shipping route</label><select id="route"><option value="island">Island</option><option value="mainland">Mainland</option></select><button class="primary" id="run-live">Run experiment</button></div></div>
+<div class="readout"><small>Server timing</small><ol id="live-results" aria-label="Server timing for each request"></ol><p id="live-status" role="status">Choose a route and run the test to measure each phase.</p></div></div></section>
+<p id="loading" role="status">Loading recorded traces…</p></div>
+<details class="notes"><summary>Experiment notes &amp; raw measurements</summary><p id="notes"></p><p>Two local Node.js services exchanged HTTP requests. OpenTelemetry linked their spans. Each phase ran 100 orders in the same sequence after eight initial warmups. During the incident, shipping used a 620 ms timer on the island route. Recovery restored the 12 ms timer.</p><a href="run.json">Download raw measurements</a> · <a href="https://github.com/Faizan00parvez/checkout-incident-lab">Reproduce the experiment</a></details>
+<footer><strong>Slip 025</strong><a href="https://x.com/faizanxbuilds">Built by @faizanxbuilds</a></footer></main>
+<dialog id="film"><div><strong>Slip 025 · Launch film</strong><button id="close-film">Close</button></div><video controls playsinline preload="none" aria-label="Slip 025 launch film"></video></dialog>
+<script src="replay.js" defer></script><script src="app.js" defer></script></body></html>

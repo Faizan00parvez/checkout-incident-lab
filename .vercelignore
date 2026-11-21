@@ -1,4 +1,5 @@
 node_modules
 .git
-launch
-
+launch/*.zip
+launch/checkout-replay.mp4
+design/
