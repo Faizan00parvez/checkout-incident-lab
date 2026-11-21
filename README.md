@@ -2,6 +2,8 @@
 
 A visitor can investigate one of 100 checkout requests and follow its trace into shipping. Built for Faizan's public cloud and DevOps field notes.
 
+[Try the recorded incident](https://checkout-incident-lab.vercel.app) ? [Follow one checkout through the code](./WALKTHROUGH.md) ? [Watch the short replay](./launch/checkout-replay.mp4)
+
 ## Reproduce the experiment
 
 Use Node.js 22 or newer. Run `npm ci`, then `npm run record`. The recorder starts two loopback HTTP services, runs eight warmups, captures 300 orders, checks parent/child trace propagation, and closes both services. Each run replaces `public/run.json`. Serve the public directory with any static web server.
