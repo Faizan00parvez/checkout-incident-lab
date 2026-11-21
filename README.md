@@ -1,8 +1,8 @@
-# The missing four
+# Slip 025
 
 A visitor can investigate one of 100 checkout requests and follow its trace into shipping. Built for Faizan's public cloud and DevOps field notes.
 
-[Try the recorded incident](https://checkout-incident-lab.vercel.app) ? [Follow one checkout through the code](./WALKTHROUGH.md) ? [Watch the short replay](./launch/checkout-replay.mp4)
+[Try the recorded incident](https://checkout-incident-lab.vercel.app) ? [Follow one checkout through the code](./WALKTHROUGH.md) ? [Watch the narrated launch film](./launch/slip-025-launch.mp4)
 
 ## Reproduce the experiment
 
